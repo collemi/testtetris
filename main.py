@@ -6,7 +6,7 @@ import time
 import linecache
 from pickle import *
 
-WIDTH_screen = 605
+WIDTH_screen = 705
 HEIGHT_screen = 1000
 
 WIDTH = 500
@@ -19,8 +19,9 @@ screen = pygame.display.set_mode((WIDTH_screen , HEIGHT_screen))
 running = True
 
 taille_image = 50
+decalage = 105
 
-x = 3*50
+x = 5*50
 y = 0
 
 tabpieces = [
@@ -48,7 +49,7 @@ tableau = [
 
 for i in range(20):
     tableau.append([])
-    for j in range(10):
+    for j in range(12):
         tableau[i].append(int(0))
 
 def affichertableau(tab):
@@ -63,7 +64,7 @@ def affichertableau(tab):
                 if case == i + 1:
                     image = pygame.image.load(f'./imgtrominos/{i + 1}.png').convert()
                 
-            screen.blit(image, (tabx*taille_image, taby*taille_image))
+            screen.blit(image, ((tabx*taille_image), (taby*taille_image)))
 
             tabx += 1
         taby += 1
@@ -77,11 +78,11 @@ def afficherpiece(strpiece, tabpiece, x, y):
             if tabpiece[pos][i][j] != 0:
                 screen.blit(image, (x + j*taille_image, y + i*taille_image))
 
-def spiece(second_piece, strpiece, tabpiece):
+def spiece(strpiece, tabpiece):
     image = pygame.image.load(f'./imgtrominos/0.png').convert()
     for i in range(len(tabpiece[1])):
         for j in range(len(tabpiece[1][i])):
-            screen.blit(image, (WIDTH + 20 + j*10, 15 + i*10))
+            screen.blit(image, (WIDTH + decalage + 20 + (j*10), 15 + i*10))
 
     ind = tetromindex[f'{strpiece}']
     image = pygame.image.load(f'./imgtrominos/{ind}.png').convert()
@@ -89,19 +90,36 @@ def spiece(second_piece, strpiece, tabpiece):
     for i in range(len(tabpiece[1])):
         for j in range(len(tabpiece[1][i])):
             if tabpiece[1][i][j] != 0:
-                screen.blit(image_small, (WIDTH + 35 + j*10, 30 + i*10))
+                screen.blit(image_small, (WIDTH + decalage + 35 + j*10, 30 + i*10))
+
+def hpiece(hold, strpiece, tabpiece):
+    if hold != -1:
+        image = pygame.image.load(f'./imgtrominos/0.png').convert()
+        for i in range(len(tabpiece[1])):
+            for j in range(len(tabpiece[1][i])):
+                screen.blit(image, (-10 + 20 + (j*10), 15 + i*10))
+
+        ind = tetromindex[f'{strpiece}']
+        image = pygame.image.load(f'./imgtrominos/{ind}.png').convert()
+        image_small = pygame.transform.scale(image, (10, 10))
+        for i in range(len(tabpiece[1])):
+            for j in range(len(tabpiece[1][i])):
+                if tabpiece[1][i][j] != 0:
+                    screen.blit(image_small, (-10 + 35 + j*10, 30 + i*10))
 
 def breakanimation(tableau, strpiece, tabpiece, x, y):
     nbrligne = 0
     for frame in range(4):
         for j in range(len(tableau)):
-            if tableau[j].count(0) == 0:
-                for k in range(len(tableau[j])):
-                    tableau[j][k] = 8 + frame
+            if tableau[j].count(0) == 2:
+                for k in range(len(tableau[j]) - 2):
+                    tableau[j][k + 2] = 8 + frame
                 nbrligne += 1
         if nbrligne >= 1:
             affichertableau(tableau)
             afficherpiece(strpiece, tabpiece, x, y)
+            pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(- 10, 100, 105, 5))
+            pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(decalage - 10, 0, 5, HEIGHT_screen))
             pygame.display.flip()
             time.sleep(0.1)
 
@@ -146,6 +164,11 @@ def verifcanmoveleft(tabpiece, tableau, pos, x, y):
             # tabpiece[pos][i][j] case de la piece dans la piece
                 if tableau[(int(y / 50) + i)][(int(x / (WIDTH/10))+j) - 1] != 0:
                     return True
+    for i in range(len(tabpiece[pos])):
+        for j in range(len(tabpiece[pos][i])):
+            if tabpiece[pos][i][j] != 0:
+                if (int(x / (WIDTH/10))+j) - 1 == 1:
+                    return True
     return False
 
 def verifrightrotation(tabpiece, tableau, pos, x, y):
@@ -161,6 +184,13 @@ def verifrightrotation(tabpiece, tableau, pos, x, y):
                         return True
                     if tableau[(int(y / 50) + i)][(int(x / (WIDTH/10))+j)] > 0:
                         return True
+
+        for i in range(len(tabpiece[tpos])):
+            for j in range(len(tabpiece[tpos][i])):
+                if tabpiece[pos][i][j] != 0:
+                    if (int(x / (WIDTH/10))+j) == 1:
+                        return True            
+        
         return False
     except IndexError:
         return True
@@ -178,6 +208,13 @@ def verifleftrotation(tabpiece, tableau, pos, x, y):
                         return True
                     if tableau[(int(y / 50) + i)][(int(x / (WIDTH/10))+j)] > 0:
                         return True
+                    
+        for i in range(len(tabpiece[tpos])):
+            for j in range(len(tabpiece[tpos][i])):
+                if tabpiece[pos][i][j] != 0:
+                    if (int(x / (WIDTH/10))+j) - 1 == 1:
+                        return True
+
         return False
     except IndexError:
         return True
@@ -192,10 +229,10 @@ def fixeThePiece(tabpiece, tableau, pos, x, y):
 def clearLine(tableau, score):
     nbrline = 0
     for i in range(len(tableau)):
-        if tableau[i].count(0) == 0:
+        if tableau[i].count(0) == 2:
             del(tableau[i])
             nbrline += 1
-            tableau.insert(0, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+            tableau.insert(0, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     
     if nbrline == 4:
         score += 500
@@ -219,12 +256,15 @@ fixe = False
 pos = 0
 nbrpiece = randrange(0,7)
 second_piece = randrange(0,7)
+holdpiece = -1
 clock = pygame.time.Clock()
 score = 0
 level = (45 - (( score // 250) + 1))
+isholdpressed = True
+isholded = False
 
-pygame.mixer.music.load('tetrissound.mp3')
-pygame.mixer.music.play(-1)
+# pygame.mixer.music.load('tetrissound.mp3')
+# pygame.mixer.music.play(-1)
 
 while running:
 
@@ -233,6 +273,24 @@ while running:
             pygame.quit()
 
     pressed = pygame.key.get_pressed()
+    if(pressed[pygame.K_LSHIFT] and not isholdpressed and not isholded):
+        isholdpressed = True
+        if holdpiece == -1:
+            holdpiece = nbrpiece
+            nbrpiece = second_piece
+            second_piece = randrange(0,7)
+            isholded = True
+        else:
+            holdpiece, nbrpiece = nbrpiece, holdpiece
+            isholded = True
+        x = 5*50
+        y = 0
+        
+        
+
+    if(not pressed[pygame.K_LSHIFT] and isholdpressed):
+        isholdpressed = False
+
     if (pressed[pygame.K_q] 
         and not appuyermove 
         and not verifcanmoveleft(tabpieces[nbrpiece], tableau, pos, x, y)):
@@ -272,14 +330,6 @@ while running:
 
     affichertableau(tableau)
 
-    if fixe == True:
-        tableau = fixeThePiece(tabpieces[nbrpiece], tableau, pos, x, y)
-        nbrpiece = second_piece
-        second_piece = randrange(0,7)
-        x = 3*50
-        y = 0
-        fixe = False
-
     if level > 10:
         level = (45 - (( score // 250) + 1))
     else:
@@ -291,20 +341,33 @@ while running:
             y += 50
         tps = 0
 
+    if fixe == True:
+        tableau = fixeThePiece(tabpieces[nbrpiece], tableau, pos, x, y)
+        isholded = False
+        nbrpiece = second_piece
+        second_piece = randrange(0,7)
+        x = 3*50
+        y = 0
+        fixe = False
+
 
 
     afficherpiece(strpiece[nbrpiece], tabpieces[nbrpiece], x, y)
 
-    spiece(second_piece, strpiece[second_piece], tabpieces[second_piece])
+    spiece(strpiece[second_piece], tabpieces[second_piece])
+
+    hpiece(holdpiece, strpiece[holdpiece], tabpieces[holdpiece])
 
     breakanimation(tableau, strpiece[nbrpiece], tabpieces[nbrpiece], x, y)
     
     tableau, score = clearLine(tableau, score)
 
-    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(WIDTH, 0, 5, HEIGHT_screen))
-    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(WIDTH, 100, 105, 5))
-    write(20,"score :",(WIDTH + 25) ,125)
-    write(20,str(score),(WIDTH + 25) , 150)
+    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(WIDTH + decalage, 0, 5, HEIGHT_screen))
+    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(WIDTH + decalage, 100, 105, 5))
+    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(- 10, 100, 105, 5))
+    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(decalage - 10, 0, 5, HEIGHT_screen))
+    write(20,"score :",(WIDTH + 25) + decalage ,125)
+    write(20,str(score),(WIDTH + 25) + decalage, 150)
     # pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(WIDTH + 20, 15, 5, 5))
 
     pygame.display.flip()
@@ -318,7 +381,7 @@ while running:
         running = False
 
     # rien ici sinon jte ban
-    clock.tick(60)
+    clock.tick(30)
 
 
 
