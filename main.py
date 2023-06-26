@@ -107,7 +107,7 @@ def hpiece(hold, strpiece, tabpiece):
                 if tabpiece[1][i][j] != 0:
                     screen.blit(image_small, (-10 + 35 + j*10, 30 + i*10))
 
-def breakanimation(tableau, strpiece, tabpiece, x, y):
+def breakanimation(tableau, nbrpiece, holdpiece, x, y):
     nbrligne = 0
     for frame in range(4):
         for j in range(len(tableau)):
@@ -117,7 +117,8 @@ def breakanimation(tableau, strpiece, tabpiece, x, y):
                 nbrligne += 1
         if nbrligne >= 1:
             affichertableau(tableau)
-            afficherpiece(strpiece, tabpiece, x, y)
+            afficherpiece(strpiece[nbrpiece], tabpieces[nbrpiece], x, y)
+            hpiece(holdpiece, strpiece[holdpiece], tabpieces[holdpiece])
             pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(- 10, 100, 105, 5))
             pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(decalage - 10, 0, 5, HEIGHT_screen))
             pygame.display.flip()
@@ -346,7 +347,7 @@ while running:
 
     hpiece(holdpiece, strpiece[holdpiece], tabpieces[holdpiece])
 
-    breakanimation(tableau, strpiece[nbrpiece], tabpieces[nbrpiece], x, y)
+    breakanimation(tableau, nbrpiece, holdpiece, x, y)
     
     tableau, score = clearLine(tableau, score)
 
