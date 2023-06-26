@@ -180,16 +180,10 @@ def verifrightrotation(tabpiece, tableau, pos, x, y):
         for i in range(len(tabpiece[tpos])):
             for j in range(len(tabpiece[tpos][i])):
                 if tabpiece[tpos][i][j] != 0:
-                    if ((int(x / (WIDTH/10))+j)) <= -1:
+                    if ((int(x / (WIDTH/10))+j)) <= 1:
                         return True
                     if tableau[(int(y / 50) + i)][(int(x / (WIDTH/10))+j)] > 0:
-                        return True
-
-        for i in range(len(tabpiece[tpos])):
-            for j in range(len(tabpiece[tpos][i])):
-                if tabpiece[pos][i][j] != 0:
-                    if (int(x / (WIDTH/10))+j) == 1:
-                        return True            
+                        return True          
         
         return False
     except IndexError:
@@ -204,15 +198,9 @@ def verifleftrotation(tabpiece, tableau, pos, x, y):
         for i in range(len(tabpiece[tpos])):
             for j in range(len(tabpiece[tpos][i])):
                 if tabpiece[tpos][i][j] != 0:
-                    if ((int(x / (WIDTH/10))+j)) <= -1:
+                    if ((int(x / (WIDTH/10))+j)) <= 1:
                         return True
                     if tableau[(int(y / 50) + i)][(int(x / (WIDTH/10))+j)] > 0:
-                        return True
-                    
-        for i in range(len(tabpiece[tpos])):
-            for j in range(len(tabpiece[tpos][i])):
-                if tabpiece[pos][i][j] != 0:
-                    if (int(x / (WIDTH/10))+j) - 1 == 1:
                         return True
 
         return False
@@ -263,8 +251,8 @@ level = (45 - (( score // 250) + 1))
 isholdpressed = True
 isholded = False
 
-# pygame.mixer.music.load('tetrissound.mp3')
-# pygame.mixer.music.play(-1)
+pygame.mixer.music.load('tetrissound.mp3')
+pygame.mixer.music.play(-1)
 
 while running:
 
