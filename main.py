@@ -247,7 +247,7 @@ nbrpiece = randrange(0,7)
 second_piece = randrange(0,7)
 holdpiece = -1
 clock = pygame.time.Clock()
-score = 0
+score = 9600
 level = (45 - (( score // 250) + 1))
 isholdpressed = True
 isholded = False
@@ -319,10 +319,10 @@ while running:
 
     affichertableau(tableau)
 
-    if level > 10:
+    if level > 5:
         level = (45 - (( score // 250) + 1))
     else:
-        level = 10
+        level = 5
 
     if tps >= level:
         fixe = verifcanmovedown(tabpieces[nbrpiece], tableau, pos, x, y)
@@ -335,7 +335,7 @@ while running:
         isholded = False
         nbrpiece = second_piece
         second_piece = randrange(0,7)
-        x = 3*50
+        x = 5*50
         y = 0
         fixe = False
 
@@ -351,7 +351,7 @@ while running:
     
     tableau, score = clearLine(tableau, score)
 
-    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(WIDTH + decalage, 0, 5, HEIGHT_screen))
+    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(WIDTH + decalage - 5, 0, 5, HEIGHT_screen))
     pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(WIDTH + decalage, 100, 105, 5))
     pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(- 10, 100, 105, 5))
     pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(decalage - 10, 0, 5, HEIGHT_screen))
@@ -362,7 +362,7 @@ while running:
     pygame.display.flip()
 
     if pressed[pygame.K_DOWN]:
-        tps += (level % 2) + level//3
+        tps += level//3
     else:
         tps += 1
     
@@ -370,7 +370,7 @@ while running:
         running = False
 
     # rien ici sinon jte ban
-    clock.tick(30)
+    clock.tick(60)
 
 
 
